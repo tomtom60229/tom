@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: tom
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      containers:
+        - image: mysql:8.0
+          imagePullPolicy: IfNotPresent
+          name: mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              value: tom123
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - name: mysql-tom
+              mountPath: /var/lib/mysql
+      volumes:
+        - name: mysql-tom
+          persistentVolumeClaim:
+            claimName: tom-mysql

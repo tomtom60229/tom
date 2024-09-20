@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: wordpress
+  namespace: tom
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 5
+  selector:
+    matchLabels:
+      app: wordpress
+  template:
+    metadata:
+      labels:
+        app: wordpress
+    spec:
+      containers:
+        - name: wordpress
+          image: wordpress:latest
+          env:
+            - name: WORDPRESS_DB_NAME
+              value: mysql
+            - name: WORDPRESS_DB_HOST
+              value: mysql:3306
+            - name: WORDPRESS_DB_USER
+              value: root
+            - name: WORDPRESS_DB_PASSWORD
+              value: tom123
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: tom-wordpress
+              mountPath: /var/www/html
+      volumes:
+        - name: tom-wordpress
+          persistentVolumeClaim:
+            claimName: tom-wp
